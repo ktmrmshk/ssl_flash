@@ -99,13 +99,18 @@ def extract_files(zipfilename, pwd=None):
     with zipfile.ZipFile(zipfilename) as zf:
       for i in zf.infolist():
         filename=i.filename
-        body=zf.read(filename, pwd.encode('utf-8'))
+        if pwd is not None:
+          body=zf.read(filename, pwd.encode('utf-8'))
+        else:
+          body=zf.read(filename)
         #ret.append({'filename': filename.encode('cp437').decode('cp932'), 'body': body})
         ret.append({'filename': filename.encode('cp437').decode('cp932'), 'body': body})
-  except Exception:
+  except Exception as err:
     import traceback
     traceback.print_exc()
-    logging.warning('unzip may require passwd')    
+    logging.warning('unzip may require passwd')
+    raise Exception(err)
+
   return ret
 
 class TrustChainTrucker(object):

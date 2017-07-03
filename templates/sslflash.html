@@ -12,7 +12,7 @@
 
     <div class="container-fluid">
       <h1>SSL-Flash ver 0.0.1</h1>      
-      <p class="text-right"><a href="#">Submission Page</a></p> 
+      <p class="text-right"><a href="/">Submission Page</a></p> 
       <h2> {{ pd.summary_num }} Certs are detected</h2>
       <ol>
         {% for leaf in pd.summary_leaf %}
@@ -21,6 +21,7 @@
       </ol>
 
       {% for certree in pd.certree %}
+      <hr style="border: 0; border-bottom: 1px dashed #ccc; background: #999;">
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
