@@ -250,7 +250,7 @@ if __name__ == '__main__':
   #print(ret)
   #print(ret[0]['filename'])
 
-  tct = TrustChainTrucker(u'JNB支給証明書20161128.zip', u'fujitsu!2016')
+  tct = TrustChainTrucker('bjn.zip', u'fujitsu!2016')
   tct.load_certs()
   #print(tct.certs)
   tct.make_certrees()
@@ -261,3 +261,6 @@ if __name__ == '__main__':
   c=parse_file('leaf.crt')
   print(tct.info(c[0]['X509']) )
   print(tct.dump_pem(c[0]['X509']))
+
+
+  print(tct.rootstore)
