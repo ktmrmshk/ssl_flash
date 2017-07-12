@@ -2,6 +2,7 @@ from flask import Flask, render_template, Markup, request, redirect, url_for
 from werkzeug.utils import secure_filename
 import sslsnip
 import os
+import sys
 
 app=Flask(__name__)
 
@@ -14,7 +15,7 @@ def proc_sslzip(filepath, pwd):
   pd['summary_num']=len(tct.certrees)
   pd['summary_leaf']=[ tree[0]['CN'] for tree in tct.certrees]
 
-  pd['certree']=[]
+  pd['certrees']=[]
   for ct in tct.certrees:
   #ct = tct.certrees[0]
     for c in ct:
@@ -29,7 +30,7 @@ def proc_sslzip(filepath, pwd):
       else:
         c['Trusted']=False
 
-    pd['certree'].append(ct)
+    pd['certrees'].append(ct)
 
   return render_template('sslflash.html', title='hoge', pd=pd)
 
@@ -57,7 +58,9 @@ def recv_sslzip():
       pwd=None
     return proc_sslzip(os.path.join('/Users/mkitamur/fflash', filename), pwd)
   except Exception as err:
-    return render_template('sslflash_form.html', pd={'message':'{}'.format(err).encode('cp437').decode('cp932')})
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    return render_template('sslflash_form.html', pd={'message':'{} --- {} {} {}'.format(err, exc_type, fname, exc_tb.tb_lineno).encode('cp437').decode('cp932')})
 
 @app.route('/test/')
 def test():

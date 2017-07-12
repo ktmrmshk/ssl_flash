@@ -21,14 +21,15 @@ def readcert(txt):
     if state == STATE['internal']:
       tmptxt+=line
       tmptxt+=b'\n'
-    if line.startswith(DELIMITER['start']):
+    pos=line.find(DELIMITER['start'])
+    if pos != -1:
       assert state == STATE['external'], 'state error: must be "external" but not'
       state = STATE['internal']
       assert tmptxt==b'', 'tmptxt must be empty, but not'
-      tmptxt+=line
+      tmptxt+=line[pos:]
       tmptxt+=b'\n'
     if line.startswith(DELIMITER['end']):
-      assert state == STATE['internal'], 'stete error: must be "internal" but not'
+      assert state == STATE['internal'], 'state error: must be "internal" but not {}'.format(line)
       state = STATE['external']
       ret.append(tmptxt)
       tmptxt=b''
@@ -44,7 +45,10 @@ def parse_cert(cert_pem, origfile=None):
   ret={}
   cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert_pem)
   ret['CN']=cert.get_subject().CN
-  ret['ISSUER']=cert.get_issuer().CN
+  if ret['CN'] is None:
+    ret['CN'] = '{} {}'.format(cert.get_subject().O, cert.get_subject().OU)
+  ret['SUBJECT']=cert.get_subject()
+  ret['ISSUER']=cert.get_issuer()
   ret['X509']=cert
   ret['ORIGFILE']=origfile
   return ret
@@ -133,6 +137,7 @@ class TrustChainTrucker(object):
     '''
     files = extract_files(self.zipfilename, self.pwd)
     for f in files:
+      print(f['filename'])
       pems = readcert(f['body'])
       for p in pems:
         self.certs.append( parse_cert(p, f['filename']) )
@@ -144,7 +149,7 @@ class TrustChainTrucker(object):
     '''
     parent = None
     for c in certstore:
-      if cert['ISSUER'] == c['CN']:
+      if cert['ISSUER'] == c['SUBJECT']:
         parent = c
         break
     
@@ -154,10 +159,11 @@ class TrustChainTrucker(object):
       return ptree
    
     else:
-      ret = re.search(r'^(\S+\.)+\S+$', cert['ISSUER'] )
+      #print('DEBUG: cert["ISSUER"]={}, file={}'.format(cert['ISSUER'], cert['ORIGFILE']))
+      ret = re.search(r'^(\S+\.)+\S+$', cert['ISSUER'].__str__() )
       if not ret:
         for r in self.rootstore:
-          if r['CN'] == cert['ISSUER']:
+          if r['SUBJECT'] == cert['ISSUER']:
             return [cert, r]
 
 
@@ -216,7 +222,7 @@ class TrustChainTrucker(object):
     # extenstions
     for i in range( x509.get_extension_count() ):
       e = x509.get_extension(i)
-      ret.append( ('X509 extensions::{}'.format(e.get_short_name() ), '{}'.format(e.__str__().encode('utf-8')))  )
+      #ret.append( ('X509 extensions::{}'.format(e.get_short_name() ), '{}'.format(e.__str__()))  )
 
     ret.append( ('Signature Algorithm', '{}'.format(x509.get_signature_algorithm())) )
     return ret

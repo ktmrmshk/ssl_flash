@@ -20,7 +20,7 @@
         {% endfor %}
       </ol>
 
-      {% for certree in pd.certree %}
+      {% for certree in pd.certrees %}
       <hr style="border: 0; border-bottom: 1px dashed #ccc; background: #999;">
       <div class="panel-group">
         <div class="panel panel-default">
@@ -50,7 +50,7 @@
           <div id="{{ certree[0].CN | replace(".", "-") }}" class="panel-collapse collapse">
             
             <ul class="list-group">
-              {% for cert in pd.certree[0] %}
+              {% for cert in certree %}
               <li class="list-group-item">
               <h4>                
                 {{ cert.CN }}
