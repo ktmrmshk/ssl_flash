@@ -79,6 +79,8 @@ def _is_trusted_chain(certs):
   certs: array of X509 Object in order like leaf -> mid1 -> mid2 -> root
 
   '''
+  if len(certs) == 1:
+    return is_selfsigned(certs[0])
   store=crypto.X509Store()
   for c in certs[1:]:
     store.add_cert(c)
@@ -154,6 +156,9 @@ class TrustChainTrucker(object):
         break
     
     if parent is not None:
+      if is_selfsigned(parent['X509']):
+        return [cert, parent]
+
       ptree = self._make_certrees(parent, certstore)
       ptree.insert(0, cert)
       return ptree
@@ -177,7 +182,9 @@ class TrustChainTrucker(object):
     midroot=[]
     for cert in self.certs:
       ret = re.search(r'^(\S+\.)+\S+$', cert['CN'] )
-      if ret:
+      if is_selfsigned(cert['X509']):
+        midroot.append(cert)
+      elif ret:# and not is_selfsigned(cert['X509']):
         #print(cert['CN'], '->leaf')
         leafs.append(cert)
         #print(leafs)
@@ -186,9 +193,12 @@ class TrustChainTrucker(object):
         midroot.append(cert)
         #print(midroot)
 
+    #print('leaf: {}'.format(leafs))
+    #print('midroot: {}'.format(midroot))
+    
     for leaf in leafs:
       self.certrees.append(self._make_certrees(leaf, midroot))
-
+  
   def is_trusted(self, certs):
     return _is_trusted_chain([ c['X509'] for c in certs] )
 
