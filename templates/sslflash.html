@@ -37,6 +37,10 @@
             {% if cert.SelfSigned %}
             <span class="label label-warning">Self Signed</span>
             {% endif%}
+            {% if certree|length is equalto 4 and loop.index == 3 %}
+            <span class="label label-info">Cross Root</span>
+            {% endif %}
+
             <br>
             {% endif %}
             {% endfor %}
@@ -60,6 +64,9 @@
                 {% if cert.SelfSigned %}
                 <span class="label label-warning">Self Signed</span>
                 {% endif%}
+                {% if certree|length is equalto 4 and loop.index == 3 %}
+                <span class="label label-info">Cross Root</span>
+                {% endif %}
               </h4>
 
               <ul>

@@ -113,7 +113,7 @@ def timefmt(txtz):
   minute = txtz[10:12]
   second = txtz[12:14]
   MON=['January', 'Februrary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-  month_txt = MON[int(month)]
+  month_txt = MON[int(month)-1]
   return '{} {}, {} at {}:{}:{} GMT'.format(month_txt, day, year, hour, minute, second)
 
 
