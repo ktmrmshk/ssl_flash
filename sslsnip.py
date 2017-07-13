@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from OpenSSL import crypto
-import logging
-import re
+import logging, re, json
+
+
+
 
 def readcert_from_file(filename):
   ret=[]
@@ -120,18 +122,19 @@ def extract_files(zipfilename, pwd=None):
   return ret
 
 class TrustChainTrucker(object):
-  def __init__(self, zipfilename, pwd):
+  def __init__(self, zipfilename, pwd, rootstorefile):
     self.zipfilename=zipfilename
     self.pwd=pwd
     self.certs=[]
     self.certrees=[]
     self.rootstore=[]
+    self.rootstorefile=rootstorefile
     
     self.load_root()
 
 
   def load_root(self):
-    self.rootstore=parse_file('lib/root.txt')
+    self.rootstore=parse_file(self.rootstorefile)
 
   def load_certs(self):
     '''
@@ -266,7 +269,7 @@ if __name__ == '__main__':
   #print(ret)
   #print(ret[0]['filename'])
 
-  tct = TrustChainTrucker('bjn.zip', u'fujitsu!2016')
+  tct = TrustChainTrucker('bjn.zip', u'fujitsu!2016', 'lib/root.txt')
   tct.load_certs()
   #print(tct.certs)
   tct.make_certrees()

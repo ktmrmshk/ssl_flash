@@ -1,13 +1,22 @@
 from flask import Flask, render_template, Markup, request, redirect, url_for
 from werkzeug.utils import secure_filename
 import sslsnip
-import os
-import sys
+import os, sys, json
+
+CURRENTDIR=os.path.abspath(os.path.dirname(__file__))
+'''
+CONFIG['ROOT_STORE_FILE']
+CONFIG['CERT_TMPDIR']
+'''
+CONFIG=dict()
+with open( os.path.join( CURRENTDIR, 'sslflash_web.conf') ) as fconf:
+  CONFIG=json.load( fconf )
+
 
 app=Flask(__name__)
 
 def proc_sslzip(filepath, pwd):
-  tct = sslsnip.TrustChainTrucker(filepath, pwd)
+  tct = sslsnip.TrustChainTrucker(filepath, pwd, os.path.join(CURRENTDIR, CONFIG['ROOT_STORE_FILE']))
   tct.load_certs()
   tct.make_certrees()
 
@@ -51,12 +60,12 @@ def recv_sslzip():
     filename = secure_filename(f.filename)
     if filename == '':
       raise Exception('Select a file (No filename was sent)')
-    f.save(os.path.join('/Users/mkitamur/fflash', filename))
+    f.save(os.path.join(CONFIG['CERT_TMPDIR'], filename))
   
     pwd = request.form.get('pwd')
     if pwd == '':
       pwd=None
-    return proc_sslzip(os.path.join('/Users/mkitamur/fflash', filename), pwd)
+    return proc_sslzip(os.path.join(CONFIG['CERT_TMPDIR'], filename), pwd)
   except Exception as err:
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
