@@ -101,6 +101,20 @@ def hexcolon(hexstr):
     hexstr = '0' + hexstr
   return ':'.join( [hexstr[i:i+2] for i in range(0, len(hexstr), 2)])
   
+def timefmt(txtz):
+  '''
+  txtz is like '2023 10 30 23 59 59 Z'
+  return: 'October 30, 2023 at 23:59:59 GMT'
+  '''
+  year = txtz[0:4]
+  month = txtz[4:6]
+  day = txtz[6:8]
+  hour = txtz[8:10]
+  minute = txtz[10:12]
+  second = txtz[12:14]
+  MON=['January', 'Februrary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  month_txt = MON[int(month)]
+  return '{} {}, {} at {}:{}:{} GMT'.format(month_txt, day, year, hour, minute, second)
 
 
 import zipfile
@@ -224,8 +238,8 @@ class TrustChainTrucker(object):
     ret.append( ('Serial Number', '{}'.format(hexcolon( hex(x509.get_serial_number()) )) ) )
     ret.append( ('Signature Algorithm', '{}'.format( x509.get_signature_algorithm().decode('utf-8')      )) )
     ret.append( ('ISSUER', '{}'.format(self._x509_str(x509.get_issuer()))) )
-    ret.append( ('Validity --> Not Before', '{}'.format(x509.get_notBefore().decode('utf-8') ) ))
-    ret.append( ('Validity --> Not After', '{}'.format(x509.get_notAfter().decode('utf-8') ) ))
+    ret.append( ('Validity --> Not Before', '{}'.format( timefmt( x509.get_notBefore().decode('utf-8')) ) ))
+    ret.append( ('Validity --> Not After', '{}'.format( timefmt( x509.get_notAfter().decode('utf-8')) ) ))
     ret.append( ('Subject', '{}'.format(self._x509_str(x509.get_subject())) ) )
     pkey=x509.get_pubkey()
     keytype=''
@@ -242,8 +256,11 @@ class TrustChainTrucker(object):
     # extenstions
     for i in range( x509.get_extension_count() ):
       e = x509.get_extension(i)
-      ret.append( ('X509 extensions --> {}'.format(e.get_short_name().decode('utf-8') ), '{}'.format(e.__str__()))  )
-
+      try:
+        ret.append( ('X509 extensions --> {}'.format(e.get_short_name().decode('utf-8') ), '{}'.format(e.__str__()))  )
+      except Exception as e:
+        pass
+    
     return ret
 
 
