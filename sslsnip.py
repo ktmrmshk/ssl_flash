@@ -95,6 +95,13 @@ def _is_trusted_chain(certs):
     return False
   return False
 
+def hexcolon(hexstr):
+  hexstr = hexstr[2:]
+  if len(hexstr[2:]) % 2 != 0:
+    hexstr = '0' + hexstr
+  return ':'.join( [hexstr[i:i+2] for i in range(0, len(hexstr), 2)])
+  
+
 
 import zipfile
 def extract_files(zipfilename, pwd=None):
@@ -214,11 +221,11 @@ class TrustChainTrucker(object):
     ret=list()
     ver=x509.get_version()
     ret.append(('Version', '{} ({})'.format(ver+1, hex(ver))))
-    ret.append( ('Serial Number', '{}'.format( hex(x509.get_serial_number()) ) ) )
-    ret.append( ('Signature Algorithm', '{}'.format(x509.get_signature_algorithm())) )
+    ret.append( ('Serial Number', '{}'.format(hexcolon( hex(x509.get_serial_number()) )) ) )
+    ret.append( ('Signature Algorithm', '{}'.format( x509.get_signature_algorithm().decode('utf-8')      )) )
     ret.append( ('ISSUER', '{}'.format(self._x509_str(x509.get_issuer()))) )
-    ret.append( ('Validity::Not Before', '{}'.format(x509.get_notBefore().decode('utf-8') ) ))
-    ret.append( ('Validity::Not After', '{}'.format(x509.get_notAfter().decode('utf-8') ) ))
+    ret.append( ('Validity --> Not Before', '{}'.format(x509.get_notBefore().decode('utf-8') ) ))
+    ret.append( ('Validity --> Not After', '{}'.format(x509.get_notAfter().decode('utf-8') ) ))
     ret.append( ('Subject', '{}'.format(self._x509_str(x509.get_subject())) ) )
     pkey=x509.get_pubkey()
     keytype=''
@@ -229,15 +236,14 @@ class TrustChainTrucker(object):
     else:
       keytype = 'Unknown'
 
-    ret.append( ('Subject Public Key Info::Public Key Algorithm', '{}'.format(keytype)) )
-    ret.append( ('Subject Public Key Info::Public Key', '{} bit'.format( pkey.bits() )) )
+    ret.append( ('Subject Public Key Info --> Public Key Algorithm', '{}'.format(keytype)) )
+    ret.append( ('Subject Public Key Info --> Public Key', '{} bit'.format( pkey.bits() )) )
     
     # extenstions
     for i in range( x509.get_extension_count() ):
       e = x509.get_extension(i)
-      #ret.append( ('X509 extensions::{}'.format(e.get_short_name() ), '{}'.format(e.__str__()))  )
+      ret.append( ('X509 extensions --> {}'.format(e.get_short_name().decode('utf-8') ), '{}'.format(e.__str__()))  )
 
-    ret.append( ('Signature Algorithm', '{}'.format(x509.get_signature_algorithm())) )
     return ret
 
 
