@@ -71,10 +71,11 @@ def recv_sslzip():
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     return render_template('sslflash_form.html', pd={'message':'{} --- {} {} {}'.format(err, exc_type, fname, exc_tb.tb_lineno).encode('cp437').decode('cp932')})
 
+@app.route('/demo/')
 @app.route('/test/')
 def test():
   #tct = sslsnip.TrustChainTrucker(u'bjn.zip', u'fujitsu!2016')
-  return proc_sslzip(u'bjn.zip', u'fujitsu!2016')
+  return proc_sslzip(os.path.join(CURRENTDIR,'lib/democerts.zip'), None)
 
 
 
