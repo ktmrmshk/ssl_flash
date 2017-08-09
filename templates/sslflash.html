@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+    <script>
+      $(function(){
+        var clipboard = new Clipboard('.btn');
+      })
+    </script>
   </head>
   <body>
 
@@ -78,12 +84,17 @@
                 {% endfor %}
               </ul>
              <p>
+
              <details>
-             <summary><strong>PEM TEXT</strong></summary>
+             <summary>
+             <strong>PEM TEXT</strong>
+             <button type="button" class="btn btn-primary btn-xs" data-clipboard-target="#{{ cert.CN | replace(".", "_") | replace(" ", "_") }}">
+                   Copy
+             </button>
+             
+             </summary>
                   <pre>
-                  <code>
-{{ cert.PEM }}
-                  </code>
+<code id="{{ cert.CN | replace(".", "_") | replace(" ", "_") }}">{{ cert.PEM }}</code>
                   </pre>
              </details>
              </p>
