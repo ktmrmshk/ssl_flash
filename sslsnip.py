@@ -44,6 +44,8 @@ def get_remote_pem(host, port=443):
   pem=ssl.get_server_certificate((host, port))
   return parse_cert(pem)
 
+def get_expiredate(x509):
+  return timefmt2( x509.get_notAfter().decode('utf-8') )
 
 def parse_cert(cert_pem, origfile=None):
   '''
@@ -120,6 +122,14 @@ def timefmt(txtz):
   MON=['January', 'Februrary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
   month_txt = MON[int(month)-1]
   return '{} {}, {} at {}:{}:{} GMT'.format(month_txt, day, year, hour, minute, second)
+
+def timefmt2(txtz):
+  'return: 2018/7/31'
+  year = txtz[0:4]
+  month = txtz[4:6]
+  day = txtz[6:8]
+  return '{}/{}/{}'.format(year, month, day)
+
 
 
 import zipfile
