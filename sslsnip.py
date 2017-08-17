@@ -39,6 +39,11 @@ def readcert(txt):
     return ret
   return None
 
+import ssl
+def get_remote_pem(host, port=443):
+  pem=ssl.get_server_certificate((host, port))
+  return parse_cert(pem)
+
 
 def parse_cert(cert_pem, origfile=None):
   '''
@@ -143,7 +148,7 @@ def extract_files(zipfilename, pwd=None):
   return ret
 
 class TrustChainTrucker(object):
-  def __init__(self, zipfilename, pwd, rootstorefile):
+  def __init__(self, zipfilename='', pwd='', rootstorefile=''):
     self.zipfilename=zipfilename
     self.pwd=pwd
     self.certs=[]
@@ -151,7 +156,8 @@ class TrustChainTrucker(object):
     self.rootstore=[]
     self.rootstorefile=rootstorefile
     
-    self.load_root()
+    if rootstorefile != '':
+      self.load_root()
 
 
   def load_root(self):
@@ -288,9 +294,6 @@ class TrustChainTrucker(object):
 import sys
 if __name__ == '__main__':
 
-  #ret=extract_files('JNB支給証明書20161128.zip', 'fujitsu!2016')
-  #print(ret)
-  #print(ret[0]['filename'])
 
   tct = TrustChainTrucker('bjn.zip', u'fujitsu!2016', 'lib/root.txt')
   tct.load_certs()
