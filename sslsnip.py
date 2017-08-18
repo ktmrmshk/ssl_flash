@@ -44,8 +44,26 @@ def get_remote_pem(host, port=443):
   pem=ssl.get_server_certificate((host, port))
   return parse_cert(pem)
 
-def get_expiredate(x509):
-  return timefmt2( x509.get_notAfter().decode('utf-8') )
+def get_expiredate(X509):
+  return timefmt2( X509.get_notAfter().decode('utf-8') )
+
+def get_cname(X509):
+  return X509.get_subject().CN
+
+def get_sanhosts(X509):
+  '''return: list of hostname like ['abc.com', 'www.abc.com', '*.abc.com'] '''
+  san=[]
+  for i in range( X509.get_extension_count() ):
+    e = X509.get_extension(i)
+    try:
+      if e.get_short_name().decode('utf-8') == 'subjectAltName':
+        #print( e.__str__())
+        #print( e.__str__().split(', '))
+        for s in e.__str__().split(', '):
+          san.append( s.replace('DNS:', '') )
+    except Exception as e:
+      pass
+  return san
 
 def parse_cert(cert_pem, origfile=None):
   '''
