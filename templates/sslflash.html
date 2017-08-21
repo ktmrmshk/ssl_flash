@@ -35,7 +35,7 @@
             {% if loop.first %}
             <h4 class="panel-title">
               <!-- <span class="badge">1</span> -->
-              <a data-toggle="collapse" href="#{{certree[0].CN | replace(".", "-") }}">{{ cert.CN }}</a>     
+              <a data-toggle="collapse" href="#{{certree[0].CN | replace(".", "-") | replace("*", "wild-card") }}">{{ cert.CN }}</a>     
             </h4>
             {% else %}
             <span class="glyphicon glyphicon-arrow-right"></span>
@@ -57,7 +57,7 @@
             {% endif %}
           </div>
 
-          <div id="{{ certree[0].CN | replace(".", "-") }}" class="panel-collapse collapse">
+          <div id="{{ certree[0].CN | replace(".", "-") | replace("*", "wild-card") }}" class="panel-collapse collapse">
             
             <ul class="list-group">
               {% for cert in certree %}
@@ -88,13 +88,13 @@
              <details>
              <summary>
              <strong>PEM TEXT</strong>
-             <button type="button" class="btn btn-primary btn-xs" data-clipboard-target="#{{ cert.CN | replace(".", "_") | replace(" ", "_") }}">
+             <button type="button" class="btn btn-primary btn-xs" data-clipboard-target="#{{ cert.CN | replace(".", "_") | replace(" ", "_") | replace("*", "wild_card")  }}">
                    Copy
              </button>
              
              </summary>
                   <pre>
-<code id="{{ cert.CN | replace(".", "_") | replace(" ", "_") }}">{{ cert.PEM }}</code>
+<code id="{{ cert.CN | replace(".", "_") | replace(" ", "_") | replace("*", "wild_card") }}">{{ cert.PEM }}</code>
                   </pre>
              </details>
              </p>
